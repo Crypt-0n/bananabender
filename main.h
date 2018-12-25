@@ -8,6 +8,7 @@ struct Road{
     char shive[STR_MAX];// string hive
     char str[STR_MAX];//string key
     char richkey[STR_MAX];//string key enrichie "hive","key","security descriptor","last write time",
+    char lwt[16];
 };
 
 typedef struct KeyInfo KeyInfo;
@@ -82,7 +83,7 @@ int get_subKeys(Road *road, KeyInfo *keyinfo);
     switch sur le Type de la value
     printf de la value, du type et des data dans le bon format
 **/
-int print_data(EnumValue enumValue);
+int print_data(EnumValue enumValue, char *rk);
 
 /**
     Converti un FILETIME en SYSTEMETIME
@@ -95,6 +96,11 @@ int make_richkey(KeyInfo *keyinfo, Road *road);
     Recupere data et value de l'index dwIndex de la structure enumValue passé en parametre
 **/
 int get_data(EnumValue *enumValue);
+
+/**
+    Converti un FILETIME en chaine de caractere au format local,"dd/mm/yyyy hhhmm"
+**/
+int flt_to_str(FILETIME *flt, char* str);
 
 /**
     Ouvre la clé contenu dans road
