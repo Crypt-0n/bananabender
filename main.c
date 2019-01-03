@@ -12,7 +12,7 @@ int main (int argc, char *argv[]){
     }
 
 int print_title(){
-    fprintf(stdout,"\"HIVE\",\"KEY\",\"cValues\",\"lpftLastWriteTime\",\"cbSecurityDescriptor\",\"DATA\",\"VALUE\"\n");
+    fprintf(stdout,"\"HIVE\",\"KEY\",\"cValues\",\"lpftLastWriteTime\",\"cbSecurityDescriptor\",\"DATA\",\"VALUE\"\n\n");
     return 0;
     }
 
@@ -59,10 +59,10 @@ int get_all(Road *road){
     KeyInfo keyinfo;
     int cod=query_key(road,&keyinfo);
     if(cod==0){
-        if(keyinfo.cValues>0){
+        if(keyinfo.cValues){
             get_values(road, &keyinfo);
         }
-        if(keyinfo.cSubKeys>0){
+        if(keyinfo.cSubKeys){
             get_subKeys(road, &keyinfo );
         }
     }else if(cod!=0){
@@ -81,6 +81,7 @@ int query_key(Road *road, KeyInfo *k){
             fprintf(stderr," %s  %s \n\n",road->shive,road->str);
         }
     }else{
+    k->cchClassName=MAX_PATH;
     retCode = RegQueryInfoKey(
         k->key,                    // key handle
         k->achClass,                // buffer for class name
@@ -218,7 +219,13 @@ int get_subKeys(Road *road, KeyInfo *keyinfo){
     KeyEnum key_enum;
     DWORD retCode=0;
     Road newRoad;
-    RegOpenKeyEx( road->hive,road->str, 0, KEY_READ, &key_enum.key);
+    if((retCode=RegOpenKeyEx( road->hive,road->str, 0, KEY_READ, &key_enum.key))!=0){
+        fprintf(stderr,"Erreur get_subKeys, retCode : %d \n",(int)retCode);
+    }else{
+
+    TCHAR subkeyName[keyinfo->cbMaxSubKey+1];
+    key_enum.lpName=subkeyName;
+
     key_enum.dwIndex = 0 ;
     while(key_enum.dwIndex < keyinfo->cSubKeys ){// && retCode==0){
         key_enum.lpcchName = (LPDWORD)keyinfo->cbMaxSubKey+1;
@@ -237,11 +244,12 @@ int get_subKeys(Road *road, KeyInfo *keyinfo){
         }else{
             fprintf(stderr,"Erreur RegEnumKeyEx, retCode : %d \n",(int)retCode);
             fprintf(stderr,"  keyinfo->cSubKeys : %d \n",(int)keyinfo->cSubKeys);
-            fprintf(stderr,"  key_enum.dwIndex : %d \n",(int)key_enum.dwIndex);
+            fprintf(stderr,"  key_enum.dwIndex : %d \n\n",(int)key_enum.dwIndex);
         }
-    key_enum.dwIndex++;
+    key_enum.dwIndex=key_enum.dwIndex+1;
     }
     RegCloseKey(key_enum.key);
+    }
     return EXIT_SUCCESS;
     }
 

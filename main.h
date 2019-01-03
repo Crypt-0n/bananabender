@@ -1,6 +1,6 @@
-#define MAX_KEY_LENGTH 9999
-#define MAX_VALUE_NAME 9999
-#define STR_MAX  9999
+#define MAX_KEY_LENGTH 999
+#define MAX_VALUE_NAME 32767
+#define STR_MAX  999
 
 typedef struct Road Road;
 struct Road{
@@ -32,7 +32,8 @@ typedef struct KeyEnum KeyEnum;
 struct KeyEnum{
     HKEY      key;     //hive
     DWORD     dwIndex;  //The index of the subkey to retrieve. This parameter should be zero for the first call to the RegEnumKeyEx function and then incremented for subsequent calls.
-    TCHAR     lpName[MAX_KEY_LENGTH];   //A pointer to a buffer that receives the name of the subkey, including the terminating null character
+    //TCHAR     lpName[MAX_KEY_LENGTH];   //A pointer to a buffer that receives the name of the subkey, including the terminating null character
+    TCHAR     *lpName;   //A pointer to a buffer that receives the name of the subkey, including the terminating null character
     LPDWORD   lpcchName;
     LPDWORD   lpReserved;   //This parameter is reserved and must be NULL.
     LPSTR     lpClass[MAX_PATH];;  //A pointer to a buffer that receives the user-defined class of the enumerated subkey. This parameter can be NULL.
